@@ -22,7 +22,7 @@
 class sinopia (
   $install_root              = '/opt',
   $install_dir               = 'sinopia',
-  $version                   = undef,    # latest
+  $version                   = latest,    # latest
   $deamon_user               = 'sinopia',
   $conf_listen_to_address    = '0.0.0.0',
   $conf_port                 = '4783',
@@ -71,12 +71,13 @@ class sinopia (
     default => undef,
     true => Service['sinopia']
   }
-  nodejs::npm { "${install_path}:sinopia":
-    version      => $version,
-    ensure       => present,
-    require      => [File[$install_path,$modules_path],User[$deamon_user]],
-    notify       => $service_notify,
-    exec_as_user => $deamon_user,
+  nodejs::npm { 'sinopia':
+    ensure  => $version,
+    target  => $install_path,
+    require => [File[$install_path,$modules_path],User[$deamon_user]],
+    notify  => $service_notify,
+    user    => $deamon_user,
+    home_dir => $install_path
   }
 
   ###
@@ -90,7 +91,7 @@ class sinopia (
     require => File[$install_path],
     notify  => $service_notify,
   }
- 
+
   if $install_as_service {
     file {'/etc/systemd/system/sinopia.service':
       ensure  => present,
@@ -120,5 +121,4 @@ WantedBy=multi-user.target
       require   => File['/etc/systemd/system/sinopia.service',"${install_path}/config.yaml"]
     }
   }
-
 }
