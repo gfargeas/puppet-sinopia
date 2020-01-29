@@ -34,7 +34,8 @@ class sinopia (
   $service_template          = 'sinopia/service.erb',
   $conf_max_body_size        = '1mb',
   $conf_max_age_in_sec       = '86400',
-  $install_as_service        = true,) {
+  $install_as_service        = true
+) {
   require nodejs
   $install_path = "${install_root}/${install_dir}"
 
@@ -89,33 +90,35 @@ class sinopia (
     require => File[$install_path],
     notify  => $service_notify,
   }
-
-  file { "${install_path}/deamon.log":
-    ensure  => present,
-    owner   => $deamon_user,
-    group   => $deamon_user,
-    require => File[$install_path],
-  }
-
+ 
   if $install_as_service {
-    $init_file = '/etc/init.d/sinopia'
+    file {'/etc/systemd/system/sinopia.service':
+      ensure  => present,
+      content => "[Unit]
+Description=Sinopia NPM Proxy/Cache Server
+After=syslog.target network.target
 
-    file { $init_file:
-      content => template($service_template),
-      mode    => '0755',
-      notify  => $service_notify,
+[Service]
+Type=simple
+User=${deamon_user}
+ExecStart=${install_path}/node_modules/sinopia/bin/sinopia
+Restart=always
+RestartSec=30
+WorkingDirectory=${install_path}
+
+[Install]
+WantedBy=multi-user.target
+"
     }
 
     service { 'sinopia':
       ensure    => running,
+      provider  => 'systemd',
       enable    => true,
       hasstatus => true,
       restart   => true,
-      require   => File[
-        $init_file,
-        "${install_path}/config.yaml",
-        "${install_path}/deamon.log"
-      ]
+      require   => File['/etc/systemd/system/sinopia.service',"${install_path}/config.yaml"]
     }
   }
+
 }
