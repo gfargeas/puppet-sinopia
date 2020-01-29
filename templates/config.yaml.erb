@@ -1,5 +1,5 @@
 # path to a directory with all packages
-storage: ./storage
+storage: <%= @conf_storage_abspath %>
 
 # a list of users
 users:
@@ -8,7 +8,7 @@ users:
     password: <%=@conf_admin_pw_hash %>
 <% if @conf_user_pw_combinations != nil %>
 <% @conf_user_pw_combinations.each do |combi|
-         -%><%= combi[0] %>:
+         -%>  <%= combi[0] %>:
     password: <%= combi[1] %>
 <% end -%>
 <% end -%>
@@ -40,11 +40,13 @@ packages:
   '*':
     # allow all users to read packages ('all' is a keyword)
     # this includes non-authenticated users
-    allow_access: all
+    allow_access: <% if @conf_user_pw_combinations != nil -%>
+<% @conf_user_pw_combinations.each do |combi| -%> <%= combi[0] %><% end -%> admin<% else -%> all<% end %>
 
     # allow 'admin' to publish packages
-    allow_publish: admin
-        # if package is not available locally, proxy requests to 'npmjs' registry
+    allow_publish: <% @conf_user_publish.each do |u| -%> <%= u %><% end -%>
+
+    # if package is not available locally, proxy requests to 'npmjs' registry
     proxy: npmjs
 
 #####################################################################
@@ -53,6 +55,9 @@ packages:
 
 # if you use nginx with custom path, use this to override links
 #url_prefix: https://dev.company.local/sinopia/
+<% if @conf_proxypass_name != nil %>
+url_prefix: <%= @conf_proxypass_name %>
+<% end -%>
 
 # you can specify listen address (or simply a port)
 # listen: localhost:4783

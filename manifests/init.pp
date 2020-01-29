@@ -23,31 +23,33 @@ class sinopia (
   $install_root              = '/opt',
   $install_dir               = 'sinopia',
   $version                   = latest,    # latest
-  $deamon_user               = 'sinopia',
+  $daemon_user               = 'sinopia',
+  $conf_proxypass_name       = undef,
   $conf_listen_to_address    = '0.0.0.0',
   $conf_port                 = '4783',
-  $conf_admin_pw_hash,
+  $conf_admin_pw_hash        = '',
   $conf_user_pw_combinations = undef,
+  $conf_user_publish         = ['admin'],
   $http_proxy                = '',
   $https_proxy               = '',
   $conf_template             = 'sinopia/config.yaml.erb',
-  $service_template          = 'sinopia/service.erb',
   $conf_max_body_size        = '1mb',
   $conf_max_age_in_sec       = '86400',
+  $conf_storage_abspath      = './storage',
   $install_as_service        = true
 ) {
   require nodejs
   $install_path = "${install_root}/${install_dir}"
 
-  group { $deamon_user:
+  group { $daemon_user:
     ensure => present,
   }
 
-  user { $deamon_user:
+  user { $daemon_user:
     ensure     => present,
-    gid        => $deamon_user,
+    gid        => $daemon_user,
     managehome => true,
-    require    => Group[$deamon_user]
+    require    => Group[$daemon_user]
   }
 
   file { $install_root:
@@ -56,9 +58,9 @@ class sinopia (
 
   file { $install_path:
     ensure  => directory,
-    owner   => $deamon_user,
-    group   => $deamon_user,
-    require => [User[$deamon_user], Group[$deamon_user]]
+    owner   => $daemon_user,
+    group   => $daemon_user,
+    require => [User[$daemon_user], Group[$daemon_user]]
   }
 
   ### ensures, that always the latest versions of npm modules are installed ###
@@ -72,11 +74,11 @@ class sinopia (
     true => Service['sinopia']
   }
   nodejs::npm { 'sinopia':
-    ensure  => $version,
-    target  => $install_path,
-    require => [File[$install_path,$modules_path],User[$deamon_user]],
-    notify  => $service_notify,
-    user    => $deamon_user,
+    ensure   => $version,
+    target   => $install_path,
+    require  => [File[$install_path,$modules_path],User[$daemon_user]],
+    notify   => $service_notify,
+    user     => $daemon_user,
     home_dir => $install_path
   }
 
@@ -85,8 +87,8 @@ class sinopia (
   ###
   file { "${install_path}/config.yaml":
     ensure  => present,
-    owner   => $deamon_user,
-    group   => $deamon_user,
+    owner   => $daemon_user,
+    group   => $daemon_user,
     content => template($conf_template),
     require => File[$install_path],
     notify  => $service_notify,
@@ -101,7 +103,7 @@ After=syslog.target network.target
 
 [Service]
 Type=simple
-User=${deamon_user}
+User=${daemon_user}
 ExecStart=${install_path}/node_modules/sinopia/bin/sinopia
 Restart=always
 RestartSec=30
