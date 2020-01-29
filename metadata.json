@@ -1,0 +1,25 @@
+{
+  "name": "gfargeas-sinopia",
+  "version": "1.0.4",
+  "author": "saheba",
+  "summary": "Module to manage sinopia installations, for details see https://github.com/rlidwka/sinopia",
+  "license": "Apache-2.0",
+  "source": "https://github.com/gfargeas/puppet-sinopia",
+  "project_page": "https://github.com/gfargeas/puppet-sinopia",
+  "issues_url": "https://github.com/gfargeas/puppet-sinopia/issues",
+  "dependencies": [
+    {
+      "name": "puppet/nodejs",
+      "version_requirement": ">= 7.0.1"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "8",
+        "9"
+      ]
+    }
+  ]
+}
