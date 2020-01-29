@@ -45,7 +45,6 @@ You can also override several configuration parameters.
     http_proxy              => 'http://proxy.com:3128',
     https_proxy             => 'http://proxy.com:3128',
     conf_template           => 'mymodule/config.yaml.erb',
-    service_template        => 'mymodule/service.erb',    
     conf_max_body_size	    => '10mb',
     conf_max_age_in_sec	    => '604800',
     install_as_service	    => false,
@@ -66,7 +65,6 @@ The default values for all so far configurable parameters are:
     http_proxy                => '',
     https_proxy               => '',
     conf_template             => 'sinopia/config.yaml.erb',
-    service_template          => 'sinopia/service.erb',
     conf_max_body_size	      => '1mb',
     conf_max_age_in_sec	      => '86400',
     install_as_service	      => true,
@@ -92,7 +90,7 @@ Here is an example for an Apply-mode installation in Debian Wheezy:
   git clone https://github.com/puppetlabs/puppetlabs-apt.git apt
   # for RHEL/Fedora/CentOS you will probably need yumrepo instead of apt
   
-  git clone https://github.com/saheba/puppet-nodejs.git nodejs
+  git clone https://github.com/voxpupuli/puppet-nodejs nodejs
   
   git clone https://github.com/saheba/puppet-sinopia.git sinopia
 ```
@@ -144,4 +142,4 @@ In your puppet script for your agent add:
 The module has been tested on the following operating systems. Testing and patches for other platforms are welcome.
 
 * RedHat EL6.
-* Debian Wheezy.
+* Debian Wheezy, Stretch, Buster.
