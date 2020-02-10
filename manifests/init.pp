@@ -63,11 +63,8 @@ class sinopia (
     require => [User[$daemon_user], Group[$daemon_user]]
   }
 
-  ### ensures, that always the latest versions of npm modules are installed ###
+  ### FIXME modules should be managed but if removed, it will be change every puppet run...
   $modules_path="${install_path}/node_modules"
-  file { $modules_path:
-    ensure => absent,
-  }
 
   $service_notify = $install_as_service ? {
     default => undef,
@@ -76,7 +73,7 @@ class sinopia (
   nodejs::npm { 'sinopia':
     ensure   => $version,
     target   => $install_path,
-    require  => [File[$install_path,$modules_path],User[$daemon_user]],
+    require  => [File[$install_path],User[$daemon_user]],
     notify   => $service_notify,
     user     => $daemon_user,
     home_dir => $install_path
